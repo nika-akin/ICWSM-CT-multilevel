@@ -122,16 +122,17 @@ If you use this pipeline or dataset, please cite:
 }
 ```
 ---
-License
 This project is licensed under the Creative Commons Attribution 4.0 International License.
 The underlying source code is licensed under the MIT License.
+
 ---
-Contact
 For questions about the methodology or data, please open an issue or contact:
 Veronika Batzdorfer  
 Karlsruhe Institute of Technology (KIT)  
 Email: veronika.batzdorfer@kit.edu
+
 ---
+
 Acknowledgments
 The `targets` ecosystem for reproducible pipelines in R.
 The `renv` team for dependency isolation.
