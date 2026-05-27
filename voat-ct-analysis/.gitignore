@@ -1,0 +1,33 @@
+# Data & outputs (too large or sensitive)
+data/*
+!data/.gitkeep
+output/
+figures/
+_targets/
+
+# R / renv
+.Rproj.user
+.Rhistory
+.RData
+.renv/
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+
+# Quarto / Shiny
+reports/*.html
+reports/*.pdf
+reports/*_files/
+shiny/rsconnect/
+
+# System
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Docker
+.dockerignore
+!Dockerfile

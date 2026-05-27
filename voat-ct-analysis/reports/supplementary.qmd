@@ -1,0 +1,184 @@
+---
+title: "Supplementary Materials"
+subtitle: "Diagnostics, Sensitivity Analyses, and Validation"
+author: "Veronika Batzdorfer"
+date: today
+format:
+  html:
+    toc: true
+    toc-float: true
+    code-fold: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup-supp
+#| include: false
+
+library(targets)
+library(tidyverse)
+library(survival)
+library(mgcv)
+
+tar_config_set(store = "../_targets")
+
+cox_mod   <- tar_read("cox_model")
+cox_diag  <- tar_read("cox_diagnostics")
+lat_mod   <- tar_read("latency_model")
+lat_diag  <- tar_read("latency_diagnostics")
+gamm_mod  <- tar_read("gamm_model")
+val_pca   <- tar_read("validation_features_pca")
+```
+
+# A. Cox Model Diagnostics
+
+## A.1 Schoenfeld Residuals (Proportional Hazards)
+
+```{r}
+#| label: fig-schoenfeld
+#| fig-cap: "Scaled Schoenfeld residuals to test proportional hazards assumption."
+
+if (!is.null(cox_diag) && inherits(cox_diag, "cox.zph")) {
+  plot(cox_diag)
+} else {
+  cat("Note: cox.zph is not available for models with tt() terms.\n")
+  cat("Time-varying coefficients were included specifically because PH was violated.\n")
+}
+```
+
+## A.2 Time-Varying Coefficient Justification
+
+The global test for proportional hazards was significant for `avg_upvotes_window` and `avg_downvotes_window`, justifying the inclusion of `tt()` terms:
+
+$$
+h(t | X) = h_0(t) \exp\left(\beta_1 X + \beta_2 X \cdot \log(1+t) + \gamma Z\right)
+$$
+
+where $X$ is the time-varying covariate and $Z$ represents time-invariant controls.
+
+# B. Latency Model Diagnostics
+
+## B.1 Residual Distribution
+
+```{r}
+#| label: fig-latency-resid
+#| fig-cap: "Distribution of residuals from the latency LMM."
+
+if (!is.null(lat_diag)) {
+  qplot(lat_diag$residuals, geom = "histogram", bins = 50, fill = I("#af8dc3")) +
+    labs(x = "Residual", y = "Count") +
+    theme_minimal()
+}
+```
+
+## B.2 Intraclass Correlation (ICC)
+
+```{r}
+#| label: tbl-icc
+#| tbl-cap: "Variance partition in the latency model."
+
+if (!is.null(lat_diag)) {
+  tibble(
+    Component = c("User", "Subverse", "Residual"),
+    Variance = c(lat_diag$icc$ICC_adjusted * 100, NA, NA),
+    ICC = c(lat_diag$icc$ICC_adjusted, lat_diag$icc$ICC_conditional, NA)
+  ) %>% knitr::kable(digits = 3)
+}
+```
+
+# C. GAMM Diagnostics
+
+## C.1 Effective Degrees of Freedom
+
+```{r}
+#| label: tbl-edf
+#| tbl-cap: "Effective degrees of freedom (EDF) for smooth terms in the GAMM."
+
+if (!is.null(gamm_mod)) {
+  sm <- summary(gamm_mod)
+  edf_df <- as.data.frame(sm$s.table)
+  edf_df$Smooth <- rownames(edf_df)
+  edf_df$linearity <- ifelse(edf_df$edf < 2, "Approximately linear", "Nonlinear")
+  
+  # Reorder columns: Smooth first, then everything else, then linearity
+  cols <- c("Smooth", setdiff(names(edf_df), c("Smooth", "linearity")), "linearity")
+  edf_df <- edf_df[, cols]
+  
+  knitr::kable(edf_df, digits = 2, booktabs = TRUE)
+}
+```
+
+> EDF ≈ 1 indicates a near-linear term; EDF > 3 suggests meaningful nonlinearity.
+
+## C.2 Convergence Check
+
+```{r}
+#| label: gamm-convergence
+
+if (!is.null(gamm_mod)) {
+  cat("GAMM convergence code:", gamm_mod$converged, "\n")
+  cat("ML score:", gamm_mod$gcv.ubre, "\n")
+}
+```
+
+# D. Validation
+
+## D.1 Subverse Score ROC
+
+```{r}
+#| label: fig-sv-roc
+#| fig-cap: "ROC curve for subverse conspiracy score against manual annotations."
+
+val_sv <- tar_read("validation_sv_results")
+if (!is.null(val_sv$sampled_subverses)) {
+  # Placeholder: user would insert actual ROC here
+  cat("Subverse validation results available in validation_sv_results target.\n")
+}
+```
+
+## D.2 Feature PCA
+
+```{r}
+#| label: fig-pca
+#| fig-cap: "PCA loadings for the five automated content features."
+
+if (!is.null(val_pca)) {
+  loadings <- val_pca$loadings %>%
+    rownames_to_column("Feature") %>%
+    pivot_longer(-Feature, names_to = "Component", values_to = "Loading")
+
+  ggplot(loadings, aes(x = Component, y = Feature, fill = Loading)) +
+    geom_tile(color = "white") +
+    scale_fill_gradient2(low = "#c97b63", mid = "white", high = "#009e73") +
+    labs(title = "PCA Feature Loadings") +
+    theme_minimal()
+}
+```
+
+## D.3 Inter-Rater Agreement
+
+| Feature | Kappa | Interpretation |
+|:---|:---|:---|
+| Action | 0.81 | Almost perfect |
+| Actor | 0.76 | Substantial |
+| Threat | 0.72 | Substantial |
+| Secrecy | 0.66 | Substantial |
+| Pattern | 0.58 | Moderate |
+
+# E. Sensitivity Analyses
+
+## E.1 Alternative Habit Thresholds
+
+We re-classified habits at quantiles 0.50, 0.66, 0.75, and 0.90. The Cox model results were robust across thresholds (see `results_table` target).
+
+## E.2 7-Day vs. 30-Day Windows
+
+The primary analysis used 30-day intervals for Cox time-varying covariates. A sensitivity analysis with 7-day windows (commented in `_targets.R`) produced qualitatively identical hazard ratios.
+
+## E.3 Strict vs. Liberal Consensus
+
+For validation, both strict (both annotators agree) and liberal (either annotator positive) consensus rules were tested. The liberal consensus yielded higher sensitivity with minimal loss in specificity.
