@@ -29,10 +29,10 @@ list(
   # ===========================================================================
   # SECTION 1: Raw Data & I/O (4 targets)
   # ===========================================================================
-  tar_target(raw_annotation_file, "data/seperated_annotation.csv", format = "file"),
-  tar_target(raw_user_info_file,  "data/user_info.csv",           format = "file"),
-  tar_target(raw_sv_scores_file,   "data/subverse_scores_wa.csv",    format = "file"),
-  tar_target(raw_subverse_file,    "data/subverse.csv",              format = "file"),
+  tar_target(raw_annotation_file, "data/raw/seperated_annotation.csv", format = "file"),
+  tar_target(raw_user_info_file,  "data/raw/user_info.csv",           format = "file"),
+  tar_target(raw_sv_scores_file,   "data/raw/subverse_scores_wa.csv",    format = "file"),
+  tar_target(raw_subverse_file,    "data/raw/subverse.csv",              format = "file"),
 
   # ===========================================================================
   # SECTION 2: Load Raw Data (4 targets)

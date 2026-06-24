@@ -1,4 +1,4 @@
-# R/plots.R — Publication-ready visualizations
+# R/06_visualization.R — Publication-ready visualizations
 # All functions return ggplot objects (or lists of them) for targets storage.
 
 library(ggplot2)
