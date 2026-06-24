@@ -60,7 +60,7 @@ Negative feedback increases dropout hazard (HR = 1.12, p < .001). Surprisingly, 
 | `transition_to_ct` | Weekly CT upshift | Binary: mean SV score increased from previous week |
 | `tenure` | Account age stratum | Short (≤365d), Mid (365-1000d), Long (>1000d) |
 
-> **Note:** Raw Voat data are not distributed in this repository due to size and privacy constraints. See `data/dictionaries/` for full schema documentation and instructions for obtaining the source dump. All analyses aggregate at community level; no usernames or identifiable text excerpts are reported.
+> **Note:** Raw Voat data will be made available at OSF. See `data/dictionaries/` for full schema documentation and instructions for obtaining the source dump. All analyses aggregate at community level; no usernames or identifiable text excerpts are reported.
 
 ---
 
