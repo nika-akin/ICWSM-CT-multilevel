@@ -92,12 +92,8 @@ voat-ct-analysis/
 │   └── figures/                  # Generated figures (Fig 1–9)
 │
 ├── shiny/                        # Interactive exploration app
-│   └── app.R                     # Survival curves, transition probabilities
-│
-└── docs/
-    ├── methodology.md            # Detailed methods documentation
-    ├── changelog.md              # Version history
-    └── ethics.md                 # Ethical considerations
+    └── app.R                     # Survival curves, transition probabilities
+
 ```
 
 ---
