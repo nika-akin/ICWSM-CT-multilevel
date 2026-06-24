@@ -94,12 +94,6 @@ voat-ct-analysis/
 ├── shiny/                        # Interactive exploration app
 │   └── app.R                     # Survival curves, transition probabilities
 │
-├── outputs/
-│   ├── poster_briefs/            # Poster design specification
-│   ├── latex/                    # Conference poster (A0 landscape)
-│   ├── claims/                   # Extracted scientific claims (JSON)
-│   └── reviews/                  # Reviewer assessments
-│
 └── docs/
     ├── methodology.md            # Detailed methods documentation
     ├── changelog.md              # Version history
